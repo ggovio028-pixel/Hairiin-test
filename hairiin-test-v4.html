@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хайрын Тест 💕</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { min-height:100vh; background:#0d0d1a; font-family:'Lato',sans-serif; color:#fff; display:flex; align-items:center; justify-content:center; overflow-x:hidden; }
+  .stars { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .star { position:absolute; background:#fff; border-radius:50%; animation:twinkle 3s infinite alternate; }
+  @keyframes twinkle { 0%{opacity:.2;transform:scale(1)} 100%{opacity:1;transform:scale(1.3)} }
+  .container { position:relative; z-index:1; max-width:540px; width:90%; margin:40px auto; }
+  .card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,182,193,0.2); border-radius:24px; padding:40px 36px; backdrop-filter:blur(12px); box-shadow:0 0 60px rgba(255,100,150,0.1); }
+  .screen { display:none; }
+  .screen.active { display:block; }
+  .btn { display:block; width:100%; padding:15px; border-radius:50px; border:none; cursor:pointer; font-size:1rem; font-family:'Lato',sans-serif; transition:all .3s ease; letter-spacing:.5px; margin-top:12px; }
+  .btn-primary { background:linear-gradient(135deg,#ff6b9d,#c44dbb); color:#fff; box-shadow:0 4px 20px rgba(255,100,150,.4); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,100,150,.5); }
+  .progress-bar-wrap { background:rgba(255,255,255,.1); border-radius:10px; height:5px; margin-bottom:32px; overflow:hidden; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,#ff6b9d,#c44dbb); border-radius:10px; transition:width .5s ease; }
+  .q-number { font-size:.75rem; letter-spacing:2px; text-transform:uppercase; color:#ff8fa3; margin-bottom:10px; }
+  .q-text { font-family:'Playfair Display',serif; font-size:1.35rem; line-height:1.5; color:#fff; margin-bottom:28px; }
+  .options { display:flex; flex-direction:column; gap:12px; }
+  .option { background:rgba(255,255,255,.06); border:1px solid rgba(255,182,193,.15); border-radius:14px; padding:14px 18px; cursor:pointer; font-size:.95rem; color:rgba(255,255,255,.85); text-align:left; transition:all .25s ease; font-family:'Lato',sans-serif; }
+  .option:hover { background:rgba(255,107,157,.2); border-color:#ff6b9d; color:#fff; transform:translateX(4px); }
+  .option.chosen { background:rgba(255,107,157,.3); border-color:#ff6b9d; color:#fff; }
+  .result-emoji { font-size:4rem; text-align:center; display:block; margin-bottom:16px; }
+  .result-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:#ffb6c1; text-align:center; margin-bottom:12px; }
+  .result-desc { font-size:.95rem; color:rgba(255,255,255,.65); line-height:1.8; text-align:center; margin-bottom:24px; }
+  .sent-note { font-size:.82rem; color:rgba(255,182,193,.6); text-align:center; margin-top:16px; }
+  .floating-hearts { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .fheart { position:absolute; bottom:-50px; animation:floatUp 4s ease-in forwards; opacity:0; }
+  @keyframes floatUp { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(-100vh) rotate(20deg);opacity:0} }
+  .spinner { width:48px; height:48px; border:3px solid rgba(255,107,157,.2); border-top-color:#ff6b9d; border-radius:50%; animation:spin 1s linear infinite; margin:20px auto; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="floating-hearts" id="floatingHearts"></div>
+<div class="container">
+<div class="card">
+
+  <!-- INTRO -->
+  <div class="screen active" id="introScreen">
+    <div style="text-align:center;font-size:3.5rem;margin-bottom:20px;animation:pulse 1.5s infinite">💕</div>
+    <div style="font-family:'Playfair Display',serif;font-size:2rem;color:#ffb6c1;margin-bottom:12px">
+      Хайрт минь,<br><em style="color:#ff8fa3">өөрийнхөө тухай хэлнэ үү!</em>
+    </div>
+    <p style="font-size:.95rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:28px">
+      Чиний тухай хэдэн асуулт байна. Үнэнчээр хариулаарай! 🌸<br><br>
+      <span style="font-size:.85rem;color:rgba(255,182,193,.5)">Хариултууд чамд санаа тавьж буй хүнд очно 📩</span>
+    </p>
+    <button class="btn btn-primary" onclick="loadQuestions()">Эхлэх ✨</button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen" id="loadingScreen">
+    <div style="text-align:center;padding:20px 0">
+      <div class="spinner"></div>
+      <div style="color:rgba(255,255,255,.6);font-size:.9rem">Асуултуудыг бэлдэж байна... 💭</div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quizScreen">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div class="q-number" id="qNumber"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="resultScreen">
+    <span class="result-emoji">🥰</span>
+    <div class="result-title">Баярлалаа!</div>
+    <div class="result-desc">Чиний хариултууд илгээгдлээ. Чамд санаа тавьж буй хүн чинь маш их баярлах болно! 💕</div>
+    <div class="sent-note">📩 Хариултууд илгээгдлээ</div>
+  </div>
+
+</div>
+</div>
+
+<script>
+emailjs.init("J-82idDJL0kv5JvmG");
+const SERVICE_ID = "service_pwr8eal";
+const TEMPLATE_ID = "template_nq2q5jh";
+const MY_EMAIL = "ggovio028@gmail.com";
+
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${Math.random()*3+2}s`;
+  document.getElementById('stars').appendChild(s);
+}
+
+let questions = [], current = 0, answers = [], answered = false;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function loadQuestions() {
+  showScreen('loadingScreen');
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: `Охин хүний талаар мэдэх 8 сонирхолтой асуулт үүсгэ. Асуулт бүрд 4 сонголт өг. Энэ нь хайртай хүн нь охиноо илүү сайн мэдэхийн тулд хийж байгаа тест. Асуултууд нь: дуртай хоол, өнгө, дуу, мөрөөдөл, зан чанар, хайрын тухай байх. Монгол хэлээр бич. Зөвхөн JSON форматаар буцаа, ямар нэг тайлбар бичихгүй:
+[{"q":"асуулт","options":["a","b","c","d"]}]
+8 асуулт байна.`
+        }]
+      })
+    });
+    const data = await res.json();
+    let text = data.content.map(i => i.text || '').join('');
+    text = text.replace(/```json|```/g, '').trim();
+    questions = JSON.parse(text);
+    current = 0; answers = [];
+    showScreen('quizScreen');
+    showQuestion();
+  } catch(e) {
+    alert('Алдаа гарлаа, дахин оролдоно уу.');
+    showScreen('introScreen');
+  }
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('qNumber').textContent = `Асуулт ${current+1} / ${questions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressBar').style.width = ((current/questions.length)*100)+'%';
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i, btn, q);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx, btn, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+  btn.classList.add('chosen');
+  spawnHearts();
+  answers.push({ q: q.q, answer: q.options[idx] });
+  setTimeout(() => { current++; current < questions.length ? showQuestion() : showResult(); }, 800);
+}
+
+async function showResult() {
+  showScreen('resultScreen');
+  for (let i = 0; i < 15; i++) setTimeout(() => spawnHearts(), i * 150);
+
+  const answersText = answers.map((a, i) =>
+    `${i+1}. ${a.q}\n   → ${a.answer}`
+  ).join('\n\n');
+
+  try {
+    await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+      to_email: MY_EMAIL,
+      answers: answersText,
+      score: "Хариултууд"
+    });
+  } catch(e) { console.error('Email error:', e); }
+}
+
+function spawnHearts() {
+  const h = document.createElement('div');
+  h.className = 'fheart';
+  h.textContent = ['💕','💖','💗','💓','🌸','✨'][Math.floor(Math.random()*6)];
+  h.style.cssText = `left:${Math.random()*100}%;animation-duration:${Math.random()*2+3}s;font-size:${Math.random()*1.5+1}rem`;
+  document.getElementById('floatingHearts').appendChild(h);
+  setTimeout(() => h.remove(), 5000);
+}
+</script>
+</body>
+</html>
